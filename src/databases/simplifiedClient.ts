@@ -35,9 +35,9 @@ export class BackendClient {
   }
 
   /**
-     * @returns {Promise<BackendClient>}
+     * @returns {BackendClient}
      */
-  static async create () {
+  static create () {
     const client = new MongoClient(MONGODB_BACKEND_AUTH, {
       serverApi: ServerApiVersion.v1
     })
