@@ -80,6 +80,11 @@ app.post("/api/register", convBodyToJson, async (req, res) => {
   const username = body.username;
   const password = body.password;
 
+  if (username == null) {
+    res.status(400).json({ error: "Username is required" });
+    return;
+  }
+
   if (password == null) {
     res.status(400).json({ error: "Password is required" });
     return;
