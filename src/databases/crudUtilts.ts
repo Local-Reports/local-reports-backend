@@ -1,5 +1,7 @@
 /** @format */
 
+import { UserType } from "../types"
+
 /**
  * @class
  */
@@ -99,7 +101,7 @@ export class CivilianUserPrompt {
  * @class
  */
 export class ReportPrompt {
-  public type: 'CIVIL' | 'POLICE'
+  public type: UserType
   public radiusMiles: Number
   public firstName: String
   public lastName: String
