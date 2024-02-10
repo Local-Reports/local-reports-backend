@@ -52,7 +52,12 @@ app.get("/api/public", function (req, res) {
 
 // This route needs authentication
 app.post("/api/login", convBodyToJson, async (req, res) => {
+
+  res.header("Access-Control-Allow-Origin", "*"); // lazy.
+
+
   const body = req.body;
+  
 
   const username = body.username;
   const password = body.password;
