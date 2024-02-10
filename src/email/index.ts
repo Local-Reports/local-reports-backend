@@ -1,1 +1,1 @@
-export {EmailClient} from './emailClient'
+export { EmailClient } from './emailClient'

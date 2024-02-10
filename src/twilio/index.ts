@@ -1,1 +1,1 @@
-export {TwilioClient} from './client'
+export { TwilioClient } from './client'

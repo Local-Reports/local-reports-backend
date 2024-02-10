@@ -1,29 +1,29 @@
-import { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER } from "./constants";
-import twilio from "twilio";
+import { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER } from './constants'
+import twilio from 'twilio'
 
 export class TwilioClient {
-  public client: twilio.Twilio;
+  public client: twilio.Twilio
 
-  constructor(public readonly accountSid: string, public readonly authToken: string, public defaultNumber: string) {
-    this.client = twilio(accountSid, authToken);
+  constructor (public readonly accountSid: string, public readonly authToken: string, public defaultNumber: string) {
+    this.client = twilio(accountSid, authToken)
   }
 
-  static create() {
-    return new TwilioClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER);
+  static create () {
+    return new TwilioClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER)
   }
 
-  public async sendSms(to: string, body: string, from = this.defaultNumber) {
+  public async sendSms (to: string, body: string, from = this.defaultNumber) {
     // verify that the phone number is valid
-    if (!to.match(/^\+1\d{10}$/)) {
-      throw new Error("Invalid phone number");
+    if (to.match(/^\+1\d{10}$/) == null) {
+      throw new Error('Invalid phone number')
     }
 
     // send the message
-    console.log(`Sending message to ${to}: ${body}`);
+    console.log(`Sending message to ${to}: ${body}`)
 
-    const data = await this.client.messages.create({ from, to, body });
+    const data = await this.client.messages.create({ from, to, body })
 
     // return the message sid
-    return data.sid;
+    return data.sid
   }
 }

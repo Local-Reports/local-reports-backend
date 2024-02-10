@@ -88,7 +88,7 @@ export class BackendClient {
     return this.currentDb.collection('users')
   }
 
-  getSightingsCol() {
+  getSightingsCol () {
     return this.currentDb.collection('sightings')
   }
 

@@ -1,1 +1,1 @@
-export {BackendClient} from './simplifiedClient'
+export { BackendClient } from './simplifiedClient'

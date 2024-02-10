@@ -6,7 +6,9 @@
   "scripts": {
     "lint": "npx ts-standard -y --fix",
     "build": "tsc",
-    "test": "npm run build && node dist/index.js"
+    "test": "npm run build && node dist/index.js",
+    "gcp-build": "npm run build",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "express-oauth2-jwt-bearer": "^1.6.0",
     "mongodb": "^6.3.0",
     "nodemailer": "^6.9.9",
+    "twilio": "^4.22.0",
     "uuid": "^9.0.1",
     "wrangler": "^3.28.1"
   }
