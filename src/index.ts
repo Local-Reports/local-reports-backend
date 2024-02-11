@@ -4,6 +4,7 @@ import { BackendClient } from "./databases";
 import { TwilioClient } from "./twilio";
 import { EmailClient } from "./email";
 import { UserType } from "./types";
+import { translateText } from "./ai_utils";
 
 const mongodbClient = BackendClient.create();
 const twilioClient = TwilioClient.create();
@@ -18,7 +19,7 @@ const loginAuth: Handler = async (req, res, next) => {
   const resp = await mongodbClient.getUsersCol().findOne({ token });
 
   if (resp === null) {
-    res.status(403).json({error: "Unauthorized, please log in."});
+    res.status(403).json({ error: "Unauthorized, please log in." });
     return;
   }
 
@@ -52,12 +53,9 @@ app.get("/api/public", function (req, res) {
 
 // This route needs authentication
 app.post("/api/login", convBodyToJson, async (req, res) => {
-
   res.header("Access-Control-Allow-Origin", "*"); // lazy.
 
-
   const body = req.body;
-  
 
   const username = body.username;
   const password = body.password;
@@ -65,7 +63,7 @@ app.post("/api/login", convBodyToJson, async (req, res) => {
   const resp = await mongodbClient.getUsersCol().findOne({ username, password });
 
   if (resp === null) {
-    res.status(403).json({error: "Invalid username or password"});
+    res.status(403).json({ error: "Invalid username or password" });
     return;
   }
 
@@ -73,7 +71,6 @@ app.post("/api/login", convBodyToJson, async (req, res) => {
 });
 
 app.post("/api/register", convBodyToJson, async (req, res) => {
-
   res.header("Access-Control-Allow-Origin", "*"); // lazy.
 
   const body = req.body;
@@ -145,14 +142,14 @@ app.get("/api/get_report/:id", loginAuth, async function (req, res) {
   const id = parseInt(req.params.id);
 
   if (isNaN(id)) {
-    res.status(400).json({error: 'Invalid id!'});
+    res.status(400).json({ error: "Invalid id!" });
     return;
   }
 
   const report = await mongodbClient.getReportsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({error: 'Report not found!'});
+    res.status(404).json({ error: "Report not found!" });
     return;
   }
 
@@ -169,20 +166,19 @@ app.get("/api/get_reports", async function (req, res) {
   const type = req.query.type as UserType | undefined;
 
   if (distance == null || isNaN(distMiles)) {
-    res.status(400).json({error: 'Invalid distance!'});
+    res.status(400).json({ error: "Invalid distance!" });
     return;
   }
 
   if (age == null || isNaN(numAge)) {
-    res.status(400).json({error: 'Invalid age!'});
+    res.status(400).json({ error: "Invalid age!" });
     return;
   }
 
-  if (type != null && type !== 'CIVIL' && type !== 'POLICE') {
-    res.status(400).json({error: 'Invalid type!'});
+  if (type != null && type !== "CIVIL" && type !== "POLICE") {
+    res.status(400).json({ error: "Invalid type!" });
     return;
   }
-
 
   const body = req.body;
 
@@ -228,14 +224,13 @@ app.get("/api/get_reports", async function (req, res) {
     return distance <= distMiles;
   });
 
-
   // filter reports by age relative to current time.
   // reports have the time in unix timestamp format, report.id
 
   reports = reports.filter((report: any) => {
     const relAge = (Date.now() - report.id) / 1000 / 60 / 60 / 24; // age in days
 
-    return relAge <= numAge
+    return relAge <= numAge;
   });
 
   // filter reports by type
@@ -244,8 +239,7 @@ app.get("/api/get_reports", async function (req, res) {
     reports = reports.filter((report: any) => report.type === type);
   }
 
-
-  res.status(200).json({reports});
+  res.status(200).json({ reports });
 });
 
 app.get("/api/get_self_reports", loginAuth, async function (req, res) {
@@ -261,19 +255,19 @@ app.post("/api/edit_report/:id", loginAuth, convBodyToJson, async function (req,
   const id = parseInt(req.params.id);
 
   if (isNaN(id)) {
-    res.status(400).json({error: 'Invalid id!'});
+    res.status(400).json({ error: "Invalid id!" });
     return;
   }
 
   const report = await mongodbClient.getReportsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({error: 'Report not found!'});
+    res.status(404).json({ error: "Report not found!" });
     return;
   }
 
   if (report.owner !== token) {
-    res.status(403).json({error: 'Unauthorized!'});
+    res.status(403).json({ error: "Unauthorized!" });
     return;
   }
 
@@ -292,12 +286,12 @@ app.post("/api/delete_report/:id", loginAuth, async function (req, res) {
   const report = await mongodbClient.getReportsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({error: 'Report not found!'});
+    res.status(404).json({ error: "Report not found!" });
     return;
   }
 
   if (report.owner !== token) {
-    res.status(403).json({error: 'Unauthorized!'});
+    res.status(403).json({ error: "Unauthorized!" });
     return;
   }
 
@@ -312,7 +306,7 @@ app.get("/api/get_sighting/:id", loginAuth, async function (req, res) {
   const report = await mongodbClient.getSightingsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({error: 'Sighting not found!'});
+    res.status(404).json({ error: "Sighting not found!" });
     return;
   }
 
@@ -333,7 +327,53 @@ app.post("/api/upload_sighting", loginAuth, convBodyToJson, async function (req,
   await mongodbClient.getSightingsCol().insertOne(body);
 
   res.status(200).json({ id });
+
+  identOwnerIdOfReport(body.report_id)
+    .then(identOwnerContactFromId)
+    .then(async (owner) => {
+      if (owner === null) {
+        return;
+      }
+
+      const translatedData = await translateText(body.data, "en"); // for now, just translate to english.
+
+      emailClient.sendEmail(owner.email, `Sighting Report summary:\n\n${translatedData}`, `Your report has been sighted!`).catch((err) => {
+        console.error("failed to send email", err);
+      });
+      twilioClient.sendSms(owner.phone, `Your report has been sighted!\n\nSummary: ${translatedData}`).catch((err) => {
+        console.error("failed to send sms", err);
+      });
+    })
+    .catch((err) => {
+      console.error(err); // silently fail.
+    });
+
+
+    app.post('/api/msg_check', async (req, res) => {
+      await emailClient.sendEmail('roccoahching@gmail.com', 'test', 'test')
+      await twilioClient.sendSms('+17705960938', 'test')
+    })
 });
+
+const identOwnerIdOfReport = async (report_id: number) => {
+  const report = await mongodbClient.getReportsCol().findOne({ id: report_id });
+
+  if (report === null) {
+    return null;
+  }
+
+  return report.owner;
+};
+
+const identOwnerContactFromId = async (owner_token: string) => {
+  const owner = await mongodbClient.getUsersCol().findOne({ token: owner_token });
+
+  if (owner === null) {
+    return null;
+  }
+
+  return owner;
+};
 
 // await new Promise((resolve, reject)=>setTimeout(resolve, 1000))
 app.listen(8080, function () {
