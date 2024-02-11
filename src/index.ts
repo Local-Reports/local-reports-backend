@@ -172,14 +172,14 @@ app.get("/api/get_reports", async function (req, res) {
 
 
   const distance = req.query.distance as string;
-  const distMiles = parseInt(distance);
+  const distKm = parseInt(distance);
 
   const age = req.query.age as string;
   const numAge = parseInt(age);
 
   const type = req.query.type as UserType | undefined;
 
-  if (distance == null || isNaN(distMiles)) {
+  if (distance == null || isNaN(distKm)) {
     res.status(400).json({ error: "Invalid distance!" });
     return;
   }
@@ -206,6 +206,7 @@ app.get("/api/get_reports", async function (req, res) {
   let reports = await mongodbClient.getReportsCol().find().toArray();
 
 
+  const toRadians = (deg: number) => deg * (Math.PI / 180);
   // filter reports
 
   // Improved precision and error handling
@@ -215,27 +216,20 @@ app.get("/api/get_reports", async function (req, res) {
       return false; // Skip reports with missing data
     }
 
-    const lat1 = parseFloat(report.lat);
-    const lon1 = parseFloat(report.lng);
-    const lat2 = lat;
-    const lon2 = lng;
+    const R = 6371e3; // Earth's radius in meters
+    const phi1 = toRadians(report.lat);
+    const phi2 = toRadians(lat);
+    const deltaPhi = toRadians(lat - report.lat);
+    const deltaLambda = toRadians(lng - report.lng);
 
-    // More precise radius of the Earth in miles
-    const R = 3958.8;
-
-    const phi1 = (lat1 * Math.PI) / 180; // φ, λ in radians
-    const phi2 = (lat2 * Math.PI) / 180;
-    const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-    const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
-
-    const a =
-      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+              Math.cos(phi1) * Math.cos(phi2) *
+              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c; // Distance in miles
+    const distance = R * c; // Distance in meters
 
-    return distance <= distMiles;
+    return (distance / 1000) <= distKm;
   });
 
 
