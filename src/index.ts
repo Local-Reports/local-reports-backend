@@ -65,7 +65,7 @@ app.post("/api/login", convBodyToJson, async (req, res) => {
   const resp = await mongodbClient.getUsersCol().findOne({ username, password });
 
   if (resp === null) {
-    res.status(403).json({});
+    res.status(403).json({error: "Invalid username or password"});
     return;
   }
 
@@ -145,14 +145,14 @@ app.get("/api/get_report/:id", loginAuth, async function (req, res) {
   const id = parseInt(req.params.id);
 
   if (isNaN(id)) {
-    res.status(400).json({});
+    res.status(400).json({error: 'Invalid id!'});
     return;
   }
 
   const report = await mongodbClient.getReportsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({});
+    res.status(404).json({error: 'Report not found!'});
     return;
   }
 
@@ -261,19 +261,19 @@ app.post("/api/edit_report/:id", loginAuth, convBodyToJson, async function (req,
   const id = parseInt(req.params.id);
 
   if (isNaN(id)) {
-    res.status(400).json({});
+    res.status(400).json({error: 'Invalid id!'});
     return;
   }
 
   const report = await mongodbClient.getReportsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({});
+    res.status(404).json({error: 'Report not found!'});
     return;
   }
 
   if (report.owner !== token) {
-    res.status(403).json({});
+    res.status(403).json({error: 'Unauthorized!'});
     return;
   }
 
@@ -292,12 +292,12 @@ app.post("/api/delete_report/:id", loginAuth, async function (req, res) {
   const report = await mongodbClient.getReportsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({});
+    res.status(404).json({error: 'Report not found!'});
     return;
   }
 
   if (report.owner !== token) {
-    res.status(403).json({});
+    res.status(403).json({error: 'Unauthorized!'});
     return;
   }
 
@@ -312,7 +312,7 @@ app.get("/api/get_sighting/:id", loginAuth, async function (req, res) {
   const report = await mongodbClient.getSightingsCol().findOne({ id });
 
   if (report === null) {
-    res.status(404).json({});
+    res.status(404).json({error: 'Sighting not found!'});
     return;
   }
 
