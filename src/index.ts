@@ -206,7 +206,6 @@ app.get("/api/get_reports", async function (req, res) {
   let reports = await mongodbClient.getReportsCol().find().toArray();
 
 
-  console.log('initial amt', reports.length)
   // filter reports
 
   // Improved precision and error handling
@@ -240,7 +239,7 @@ app.get("/api/get_reports", async function (req, res) {
   });
 
 
-  console.log('after dist', reports.length)
+
   // filter reports by age relative to current time.
   // reports have the time in unix timestamp format, report.id
 
@@ -250,16 +249,15 @@ app.get("/api/get_reports", async function (req, res) {
     return relAge <= numAge;
   });
 
-  console.log('reports after age', reports.length)
 
   // filter reports by type
 
-  console.log('type', reports)
+
   if (type != null) {
     reports = reports.filter((report: any) => report.type === type);
   }
 
-  console.log('reports after type', reports.length)
+  
   res.status(200).json({ reports });
 });
 
