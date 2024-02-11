@@ -203,7 +203,7 @@ app.get("/api/get_reports", async function (req, res) {
 
   // We need to filter the reports by distance within a threshhold, so calculate difference.
 
-  let reports = await mongodbClient.getReportsCol().find({}).toArray();
+  let reports = await mongodbClient.getReportsCol().find().toArray();
 
   // filter reports
 
