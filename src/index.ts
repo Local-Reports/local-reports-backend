@@ -159,6 +159,16 @@ app.get("/api/get_report/:id", loginAuth, async function (req, res) {
 app.get("/api/get_reports", async function (req, res) {
 
 
+  // const slat = req.query.lat as string;
+  // const slng = req.query.lng as string;
+
+  // const lat = parseFloat(slat);
+  // const lng = parseFloat(slng);
+
+  // if (isNaN(lat) || isNaN(lng)) {
+  //   res.status(400).json({ error: "Invalid lat or lng!" });
+  //   return;
+  // }
 
 
   const distance = req.query.distance as string;
@@ -184,7 +194,6 @@ app.get("/api/get_reports", async function (req, res) {
     return;
   }
 
-  const body = req.body;
 
   // all values from getReportsCol() have lats and lngs.
   // our body has a lat and lng.
@@ -199,34 +208,34 @@ app.get("/api/get_reports", async function (req, res) {
   // filter reports
 
   // Improved precision and error handling
-  reports = reports.filter((report: any) => {
-    if (!report.lat || !report.lng) {
-      console.error("Missing lat or lng in report:", report);
-      return false; // Skip reports with missing data
-    }
+  // reports = reports.filter((report: any) => {
+  //   if (!report.lat || !report.lng) {
+  //     console.error("Missing lat or lng in report:", report);
+  //     return false; // Skip reports with missing data
+  //   }
 
-    const lat1 = parseFloat(report.lat);
-    const lon1 = parseFloat(report.lng);
-    const lat2 = parseFloat(body.lat);
-    const lon2 = parseFloat(body.lng);
+  //   const lat1 = parseFloat(report.lat);
+  //   const lon1 = parseFloat(report.lng);
+  //   const lat2 = lat;
+  //   const lon2 = lng;
 
-    // More precise radius of the Earth in miles
-    const R = 3958.8;
+  //   // More precise radius of the Earth in miles
+  //   const R = 3958.8;
 
-    const phi1 = (lat1 * Math.PI) / 180; // φ, λ in radians
-    const phi2 = (lat2 * Math.PI) / 180;
-    const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-    const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+  //   const phi1 = (lat1 * Math.PI) / 180; // φ, λ in radians
+  //   const phi2 = (lat2 * Math.PI) / 180;
+  //   const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  //   const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
 
-    const a =
-      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  //   const a =
+  //     Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+  //     Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c; // Distance in miles
+  //   const distance = R * c; // Distance in miles
 
-    return distance <= distMiles;
-  });
+  //   return distance <= distMiles;
+  // });
 
   // filter reports by age relative to current time.
   // reports have the time in unix timestamp format, report.id
