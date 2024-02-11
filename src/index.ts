@@ -240,17 +240,17 @@ app.get("/api/get_reports", async function (req, res) {
   // filter reports by age relative to current time.
   // reports have the time in unix timestamp format, report.id
 
-  reports = reports.filter((report: any) => {
-    const relAge = (Date.now() - report.id) / 1000 / 60 / 60 / 24; // age in days
+  // reports = reports.filter((report: any) => {
+  //   const relAge = (Date.now() - report.id) / 1000 / 60 / 60 / 24; // age in days
 
-    return relAge <= numAge;
-  });
+  //   return relAge <= numAge;
+  // });
 
   // filter reports by type
 
-  if (type != null) {
-    reports = reports.filter((report: any) => report.type === type);
-  }
+  // if (type != null) {
+  //   reports = reports.filter((report: any) => report.type === type);
+  // }
 
   res.status(200).json({ reports });
 });
