@@ -341,7 +341,7 @@ app.post("/api/upload_sighting", loginAuth, convBodyToJson, async function (req,
 
   res.status(200).json({ id });
 
-  identOwnerIdOfReport(body.report_id)
+  identOwnerIdOfReport(body.parent_id)
     .then(identOwnerContactFromId)
     .then(async (owner) => {
       if (owner === null) {
