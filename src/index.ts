@@ -348,7 +348,9 @@ app.post("/api/upload_sighting", loginAuth, convBodyToJson, async function (req,
         return;
       }
 
-      const translatedData = await translateText(body.data, "en"); // for now, just translate to english.
+      const data = body.whereSeeLocation
+
+      const translatedData = await translateText(data, "en"); // for now, just translate to english.
 
       emailClient.sendEmail(owner.email, `Sighting Report summary:\n\n${translatedData}`, `Your report has been sighted!`).catch((err) => {
         console.error("failed to send email", err);
