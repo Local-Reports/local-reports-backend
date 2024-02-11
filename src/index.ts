@@ -186,11 +186,11 @@ app.get("/api/get_reports", async function (req, res) {
 
   const body = req.body;
 
-  // all values from getReportsCol() have latitudes and longitudes.
-  // our body has a latitude and longitude.
+  // all values from getReportsCol() have lats and lngs.
+  // our body has a lat and lng.
 
-  // We need to retrieve all the reports within a certain distance of the body's latitude and longitude.
-  // Approximate distance in miles. (1 degree of latitude is 69 miles) (1 degree of longitude is 69 miles at the equator, and 0 miles at the poles)
+  // We need to retrieve all the reports within a certain distance of the body's lat and lng.
+  // Approximate distance in miles. (1 degree of lat is 69 miles) (1 degree of lng is 69 miles at the equator, and 0 miles at the poles)
 
   // We need to filter the reports by distance within a threshhold, so calculate difference.
 
@@ -200,15 +200,15 @@ app.get("/api/get_reports", async function (req, res) {
 
   // Improved precision and error handling
   reports = reports.filter((report: any) => {
-    if (!report.latitude || !report.longitude) {
-      console.error("Missing latitude or longitude in report:", report);
+    if (!report.lat || !report.lng) {
+      console.error("Missing lat or lng in report:", report);
       return false; // Skip reports with missing data
     }
 
-    const lat1 = parseFloat(report.latitude);
-    const lon1 = parseFloat(report.longitude);
-    const lat2 = parseFloat(body.latitude);
-    const lon2 = parseFloat(body.longitude);
+    const lat1 = parseFloat(report.lat);
+    const lon1 = parseFloat(report.lng);
+    const lat2 = parseFloat(body.lat);
+    const lon2 = parseFloat(body.lng);
 
     // More precise radius of the Earth in miles
     const R = 3958.8;
