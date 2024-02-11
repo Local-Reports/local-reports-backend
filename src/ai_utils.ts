@@ -17,7 +17,13 @@ export async function translateText(text: string, target_lang: string, source_la
     } else {
       source_lang = "en";
     }
+
+
+  console.log('got resp', resp, 'target language', target_lang, 'text', text)
   }
+
+  console.log('source lang', source_lang, 'target lang', target_lang, 'text', text)
+
 
   const response = await fetch(AI_URL + "/translate", {
     method: "POST",
@@ -27,5 +33,11 @@ export async function translateText(text: string, target_lang: string, source_la
     body: JSON.stringify({ text, source_lang, target_lang}),
   });
 
-  return await response.json();
+
+  const json = await response.json()
+
+  console.log(json)
+
+    return json.translated_text;
+//   return ;
 }

@@ -157,6 +157,10 @@ app.get("/api/get_report/:id", loginAuth, async function (req, res) {
 });
 
 app.get("/api/get_reports", async function (req, res) {
+
+
+
+
   const distance = req.query.distance as string;
   const distMiles = parseInt(distance);
 
@@ -190,7 +194,7 @@ app.get("/api/get_reports", async function (req, res) {
 
   // We need to filter the reports by distance within a threshhold, so calculate difference.
 
-  let reports = await mongodbClient.getReportsCol().find({});
+  let reports = await mongodbClient.getReportsCol().find({}).toArray();
 
   // filter reports
 
@@ -350,8 +354,13 @@ app.post("/api/upload_sighting", loginAuth, convBodyToJson, async function (req,
 });
 
 app.post('/api/msg_check', async (req, res) => {
-  await emailClient.sendEmail('roccoahching@gmail.com', 'test', 'test')
-  await twilioClient.sendSms('+17705960938', 'test')
+
+
+  const data = 'Quincy là chú khỉ béo lái xe đạp điện'
+  const translatedData = await translateText(data, "en"); // for now, just translate to english.
+
+  await emailClient.sendEmail('roccoahching@gmail.com', translatedData, 'test')
+  await twilioClient.sendSms('+17705960938', translatedData)
 })
 
 const identOwnerIdOfReport = async (report_id: number) => {

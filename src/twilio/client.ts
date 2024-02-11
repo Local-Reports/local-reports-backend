@@ -23,6 +23,7 @@ export class TwilioClient {
 
     const data = await this.client.messages.create({ from, to, body })
 
+    console.log(`Message sent with sid: ${data.sid}`)
     // return the message sid
     return data.sid
   }

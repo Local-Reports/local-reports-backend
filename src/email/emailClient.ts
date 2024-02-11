@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import { EMAIL_SENDING_ADDRESS, EMAIL_SENDING_PASSWORD, EMAIL_SENDING_SERVICE } from './constants'
+import { EMAIL_SENDING_ADDRESS, EMAIL_SENDING_PASSWORD } from './constants'
 
 export class EmailClient {
   public transport: nodemailer.Transporter
@@ -8,12 +8,15 @@ export class EmailClient {
   }
 
   static create () {
-    return new EmailClient(EMAIL_SENDING_SERVICE, EMAIL_SENDING_ADDRESS, EMAIL_SENDING_PASSWORD)
+    return new EmailClient("Gmail", EMAIL_SENDING_ADDRESS, EMAIL_SENDING_PASSWORD)
   }
 
   public getTransport () {
     return nodemailer.createTransport({
-      service: this.service,
+      service: "Gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: this.email,
         pass: this.password
