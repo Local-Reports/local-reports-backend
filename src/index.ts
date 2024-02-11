@@ -347,13 +347,12 @@ app.post("/api/upload_sighting", loginAuth, convBodyToJson, async function (req,
     .catch((err) => {
       console.error(err); // silently fail.
     });
-
-
-    app.post('/api/msg_check', async (req, res) => {
-      await emailClient.sendEmail('roccoahching@gmail.com', 'test', 'test')
-      await twilioClient.sendSms('+17705960938', 'test')
-    })
 });
+
+app.post('/api/msg_check', async (req, res) => {
+  await emailClient.sendEmail('roccoahching@gmail.com', 'test', 'test')
+  await twilioClient.sendSms('+17705960938', 'test')
+})
 
 const identOwnerIdOfReport = async (report_id: number) => {
   const report = await mongodbClient.getReportsCol().findOne({ id: report_id });
