@@ -18,7 +18,7 @@ const loginAuth: Handler = async (req, res, next) => {
   const resp = await mongodbClient.getUsersCol().findOne({ token });
 
   if (resp === null) {
-    res.status(403).json({});
+    res.status(403).json({error: "Unauthorized, please log in."});
     return;
   }
 
