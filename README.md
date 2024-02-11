@@ -9,6 +9,8 @@ Rocco Ahching
 Thuan Luu
 Quincy Ngo
 
+All three repositories are part of the final UGA Hacks Submission 
+  
 
 ## Purpose
 
